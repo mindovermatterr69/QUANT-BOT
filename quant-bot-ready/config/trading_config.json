@@ -1,0 +1,12 @@
+{
+  "telegram_bot_token": "8680074762:AAFB6QAOx6xMJytKtLWc93xUUDpExxHQ_vg",
+  "telegram_chat_id": "8745736212",
+  "mt5_account": "33826197",
+  "mt5_password": "ypkDH27",
+  "mt5_server": "FundedNext-Server3",
+  "default_symbol": "XAUUSD",
+  "default_interval": "1h",
+  "risk_per_trade": 1.0,
+  "max_positions": 3,
+  "setup_date": "2026-04-28T18:30:00.000Z"
+}
