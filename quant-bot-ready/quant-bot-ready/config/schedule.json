@@ -1,8 +1,0 @@
-{
-  "enabled": true,
-  "interval_minutes": 15,
-  "symbols": ["XAUUSD"],
-  "min_confidence": 0.2,
-  "notify_on_hold": true,
-  "last_signal": null
-}
