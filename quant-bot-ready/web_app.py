@@ -1,32 +1,41 @@
 import os
 import sys
-import logging
-
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from flask import Flask
-import asyncio
 from telegram import Bot
 
 app = Flask(__name__)
 
-def send_telegram_msg(msg):
-    """Helper to send telegram message"""
+TELEGRAM_TOKEN = "8680074762:AAFB6QAOx6xMJytKtLWc93xUUDpExxHQ_vg"
+CHAT_ID = "8745736212"
+
+def send_signal_telegram(action, price, conf, sl=None, tp=None):
     try:
-        token = "8680074762:AAFB6QAOx6xMJytKtLWc93xUUDpExxHQ_vg"
-        bot = Bot(token=token)
-        # Run async in new loop
+        import asyncio
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(bot.send_message(chat_id=8745736212, text=msg))
+        
+        bot = Bot(token=TELEGRAM_TOKEN)
+        
+        msg = f"XAUUSD\n{action}\nEntry: {price:.2f}\nConf: {conf}%"
+        if sl and tp:
+            msg += f"\nSL: {sl:.2f}\nTP: {tp:.2f}"
+        
+        async def send():
+            await bot.send_message(chat_id=CHAT_ID, text=msg)
+        
+        loop.run_until_complete(send())
         loop.close()
         return True
-    except:
+    except Exception as e:
+        print(f"Telegram error: {e}")
         return False
 
 @app.route('/')
 def home():
-    return "Quant Bot Running - /signal for signals"
+    return "Quant Bot Running. Use /signal"
 
 @app.route('/signal')
 def get_signal():
@@ -37,11 +46,10 @@ def get_signal():
         df = fetch_data('XAUUSD', interval='1h', period='7d')
         df = df.dropna()
         signal = generate_professional_signal(df)
-        price = df['close'].iloc[-1]
+        price = float(df['close'].iloc[-1])
         
         action = signal['action']
         conf = int(signal['confidence'] * 100)
-        
         atr = price * 0.008
         
         result = {
@@ -58,14 +66,9 @@ def get_signal():
             else:
                 result['sl'] = round(price + (atr * 2), 2)
                 result['tp'] = round(price - (atr * 3), 2)
-        
-        # Send telegram
-        msg = f"XAUUSD\n{action}\nEntry: {price:.2f}\nConf: {conf}%"
-        if action != 'HOLD':
-            msg += f"\nSL: {result['sl']:.2f}\nTP: {result['tp']:.2f}"
-        
-        send_telegram_msg(msg)
-        result['signal_sent'] = True
+            
+            send_signal_telegram(action, price, conf, result['sl'], result['tp'])
+            result['telegram'] = 'sent'
         
         return result
         

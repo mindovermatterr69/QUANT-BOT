@@ -52,7 +52,7 @@ async def run_scheduler():
                 now = datetime.now().strftime("%d %H:%M")
                 
                 if action == "HOLD":
-                    msg = f"XAUUSD | {now}\n=======================\nHOLD\nConf: {conf}%\nPrice: {price:.2f}\nWaiting..."
+                    msg = f"XAUUSD | {now}\nHOLD\nConf: {conf}%\nPrice: {price:.2f}"
                 else:
                     if action == "BUY":
                         sl = price - (atr * 2)
@@ -61,7 +61,7 @@ async def run_scheduler():
                         sl = price + (atr * 2)
                         tp = price - (atr * 3)
                     
-                    msg = f"XAUUSD | {now}\n=======================\n{action}\nENTRY: {price:.2f}\nSL: {sl:.2f}\nTP: {tp:.2f}\nConf: {conf}%\nR:R 1:1.5"
+                    msg = f"XAUUSD | {now}\n{action}\nEntry: {price:.2f}\nSL: {sl:.2f}\nTP: {tp:.2f}\nConf: {conf}%"
                 
                 await bot.send_message(chat_id=chat_id, text=msg)
                 print(f"Sent: {action} @ {price:.2f}")
