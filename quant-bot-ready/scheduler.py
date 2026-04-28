@@ -4,14 +4,14 @@ import json
 import sys
 import os
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
 async def run_scheduler():
     from telegram import Bot
     from data.fetcher import fetch_data
     from strategy.professional import generate_professional_signal
     
-    config_path = os.path.join(os.path.dirname(__file__), 'config', 'schedule.json')
+    config_path = os.path.join(base_dir, 'config', 'schedule.json')
     config = json.load(open(config_path)) if os.path.exists(config_path) else {}
     
     token = "8680074762:AAFB6QAOx6xMJytKtLWc93xUUDpExxHQ_vg"
@@ -22,7 +22,6 @@ async def run_scheduler():
     print("Use Ctrl+C to stop")
     
     while True:
-        # Reload config in case changed
         if os.path.exists(config_path):
             config = json.load(open(config_path))
         
@@ -44,7 +43,6 @@ async def run_scheduler():
             
             min_conf = config.get('min_confidence', 0.3) * 100
             
-            # Always send if not HOLD or confidence high enough
             if action == "HOLD" and conf < min_conf:
                 print(f"HOLD @ {conf}% - skipping (low conf)")
             else:
